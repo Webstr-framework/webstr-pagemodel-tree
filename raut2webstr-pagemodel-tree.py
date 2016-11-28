@@ -46,27 +46,24 @@ def move_files(directory, src_module, src_files, dry_run=False, root_path=None):
         new_file_path = os.path.join(new_module_path, "{}.py".format(src_module))
         if root_path is not None:
             import_path = os.path.relpath(new_module_path,
-                                          root_path).replace('/', '.')
-        else:
-            import_path = filename[:-3]
-        import_path += '.'
+                                          root_path).replace('/', '.') + '.'
         if dry_run:
             print('mkdir {}'.format(new_module_path))
             print('touch {}'.format(new_module_ini_path))
-            print('echo "import {0}{1}\n" >> {2}'.format(import_path,
-                                                         src_module,
-                                                         new_module_ini_path))
+            if root_path is not None:
+                print('echo "import {0}{1}\n" >> {2}'.format(import_path,
+                                                             src_module,
+                                                             new_module_ini_path))
         else:
             try:
                 os.mkdir(new_module_path)
             except FileExistsError:
                 pass
             os.open(new_module_ini_path, os.O_CREAT, mode=0o664)
-            ini_file = open(new_module_ini_path, 'a')
             if root_path is not None:
-                os.path.relpath(new_module_path, root_path)
-            ini_file.write('import {0}{1}\n'.format(import_path, src_module))
-            ini_file.close()
+                ini_file = open(new_module_ini_path, 'a')
+                ini_file.write('import {0}{1}\n'.format(import_path, src_module))
+                ini_file.close()
         if dry_run:
             print('mv {0} {1}'.format(old_file_path, new_file_path))
         else:
@@ -81,7 +78,7 @@ def main(argv=None):
         help='file path to page/model directory tree in raut format')
     parser.add_argument('-d', '--dry-run', action="store_true")
     parser.add_argument('-r', '--root-path', type=str,
-                        help='root path of a project, the import path '
+                        help='root path of the project, the import path '
                              'will be constructed relatively to this path')
     args = parser.parse_args()
 
