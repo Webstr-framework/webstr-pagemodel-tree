@@ -54,7 +54,7 @@ def move_files(directory, src_module, src_files, dry_run=False, root_path=None):
             print('mkdir {}'.format(new_module_path))
             print('touch {}'.format(new_module_ini_path))
             print('echo "import {0}{1}\n" >> {2}'.format(import_path,
-                                                         filename,
+                                                         src_module,
                                                          new_module_ini_path))
         else:
             try:
@@ -65,7 +65,7 @@ def move_files(directory, src_module, src_files, dry_run=False, root_path=None):
             ini_file = open(new_module_ini_path, 'a')
             if root_path is not None:
                 os.path.relpath(new_module_path, root_path)
-            ini_file.write('import {0}{1}'.format(import_path, filename))
+            ini_file.write('import {0}{1}\n'.format(import_path, src_module))
             ini_file.close()
         if dry_run:
             print('mv {0} {1}'.format(old_file_path, new_file_path))
