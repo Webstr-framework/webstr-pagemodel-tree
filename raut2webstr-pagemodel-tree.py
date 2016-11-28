@@ -46,9 +46,10 @@ def move_files(directory, src_module, src_files, dry_run=False, root_path=None):
         new_file_path = os.path.join(new_module_path, "{}.py".format(src_module))
         if root_path is not None:
             import_path = os.path.relpath(new_module_path,
-                                          root_path).replace('/', '.') + '.'
+                                          root_path).replace('/', '.')
         else:
-            import_path = ''
+            import_path = filename[:-3]
+        import_path += '.'
         if dry_run:
             print('mkdir {}'.format(new_module_path))
             print('touch {}'.format(new_module_ini_path))
