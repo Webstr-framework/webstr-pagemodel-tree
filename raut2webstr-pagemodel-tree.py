@@ -33,7 +33,7 @@ def is_py_file(filename):
     return filename.endswith(".py") and filename != "__init__.py"
 
 
-def move_files(directory, src_module, src_files, dry_run=False):
+def move_files(directory, src_module, src_files, dry_run=False, root_path=None):
     """
     Move python files (provided in src_files) from given src_module
     into new structure, which is created in given directory.
@@ -41,18 +41,31 @@ def move_files(directory, src_module, src_files, dry_run=False):
     for filename in src_files:
         # dropping ".py" suffix
         new_module_path = os.path.join(directory, filename[:-3])
-        new_module_ini_path = os.path.join(new_module_path, "__ini__.py")
+        new_module_ini_path = os.path.join(new_module_path, "__init__.py")
         old_file_path = os.path.join(directory, src_module, filename)
         new_file_path = os.path.join(new_module_path, "{}.py".format(src_module))
+        if root_path is not None:
+            import_path = os.path.relpath(new_module_path,
+                                          root_path).replace('/', '.') + '.'
+        else:
+            import_path = ''
         if dry_run:
             print('mkdir {}'.format(new_module_path))
             print('touch {}'.format(new_module_ini_path))
+            print('echo "import {1}{2}\n" >> {3}'.format(import_path,
+                                                         filename,
+                                                         new_module_ini_path))
         else:
             try:
                 os.mkdir(new_module_path)
             except FileExistsError:
                 pass
             os.open(new_module_ini_path, os.O_CREAT, mode=0o664)
+            ini_file = open(new_module_ini_path, 'a')
+            if root_path is not None:
+                os.path.relpath(new_module_path, root_path)
+            ini_file.write('import {1}{2}'.format(import_path, filename))
+            ini_file.close()
         if dry_run:
             print('mv {0} {1}'.format(old_file_path, new_file_path))
         else:
@@ -66,6 +79,9 @@ def main(argv=None):
         'directory',
         help='file path to page/model directory tree in raut format')
     parser.add_argument('-d', '--dry-run', action="store_true")
+    parser.add_argument('-r', '--root-path', type=str,
+                        help='root path of a project, the import path '
+                             'will be constructed relatively to this path')
     args = parser.parse_args()
 
     # quick input validation
@@ -92,7 +108,8 @@ def main(argv=None):
 
     # do the transformation, happens in place
     for mod in MODULES:
-        move_files(args.directory, mod, files[mod], dry_run=args.dry_run)
+        move_files(args.directory, mod, files[mod], dry_run=args.dry_run,
+                   root_path=args.root_path)
     # delete empty __ini__.py files in old page/model directories
     for init_file in empty_init_files:
         if args.dry_run:
