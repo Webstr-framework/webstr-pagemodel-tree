@@ -116,7 +116,8 @@ def main(argv=None):
             python_files = [fl for fl in file_list if is_py_file(fl)]
             move_files(args.directory, raut_module, dirname, python_files,
                        dry_run=args.dry_run, root_path=args.root_path)
-            if "__init__.py" in file_list:
+            if "__init__.py" in file_list and \
+                    os.path.getsize(os.path.join(dirname, '__init__.py')) == 0:
                 empty_init_files.append(os.path.join(dirname, "__init__.py"))
 
     # delete empty __ini__.py files in old page/model directories
@@ -131,7 +132,7 @@ def main(argv=None):
                 os.path.join(args.directory, raut_module), topdown=False):
             if args.dry_run:
                 print("rmdir {}".format(dirname))
-            elif len(file_list) == 0:
+            elif len(os.listdir(dirname)) == 0:
                 os.rmdir(dirname)
 
 
