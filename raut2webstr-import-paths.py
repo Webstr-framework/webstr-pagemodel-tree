@@ -5,6 +5,7 @@
 raut2webstr-pagemodel-tree import-path script
 """
 
+# Copyright 2016 Luboš Tříletý <ltrilety@redhat.com>
 # Copyright 2016 Martin Bukatovič <mbukatov@redhat.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
