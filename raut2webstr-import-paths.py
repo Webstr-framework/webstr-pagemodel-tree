@@ -36,50 +36,50 @@ def is_py_file(filename):
 
 
 def change_import_path(directory, module, src_file, dry_run=False):
-  """
-  Change import paths to correspond with the new tree structure
-  """
-  new_lines = []
-  module_present = False
+    """
+    Change import paths to correspond with the new tree structure
+    """
+    new_lines = []
+    module_present = False
 
-  current_file = os.path.join(directory, src_file)
+    current_file = os.path.join(directory, src_file)
 
-  if dry_run:
-      with open(current_file, 'r') as file_to_read:
-          containt = file_to_read.read()
-          if module in containt:
-              if re.search(r'^import .*models.*|import .*models.*', containt):
-                  print("sed -i 's/([^ ]+)\.{0}([^ \\n]+)/\\1\\2.{0}/g'"
-                            " {1}".format(module, src_file))
-              if re.search(r'^from .*models.*|from .*models.*', containt):
-                  print("sed -i 's/([^ ]+)\.{0} import (\w+)/\\1.\\2"
-                            " import {0}/g' {1}".format(module, src_file))
+    if dry_run:
+        with open(current_file, 'r') as file_to_read:
+            containt = file_to_read.read()
+            if module in containt:
+                if re.search(r'^import .*models.*|import .*models.*', containt):
+                    print("sed -i 's/([^ ]+)\.{0}([^ \\n]+)/\\1\\2.{0}/g'"
+                              " {1}".format(module, src_file))
+                if re.search(r'^from .*models.*|from .*models.*', containt):
+                    print("sed -i 's/([^ ]+)\.{0} import (\w+)/\\1.\\2"
+                              " import {0}/g' {1}".format(module, src_file))
 
-  with open(current_file, 'r') as file_to_read:
-      for line in file_to_read:
-          if module in line:
-              module_present = True
-              if 'from' not in line:
-                  new_lines.append(
-                      re.sub(
-                          r'(?P<pre>[^ ]+)\.{}(?P<post>[^ \n]+)'
-                              .format(module),
-                          r'\g<pre>\g<post>.{}'.format(module),
-                          line))
-              else:
-                  new_lines.append(
-                      re.sub(
-                          r'(?P<pre>[^ ]+)\.{} import (?P<post>\w+)'
-                              .format(module),
-                          r'\g<pre>.\g<post> import {}'.format(module),
-                          line))
-          else:
-              new_lines.append(line)
+    with open(current_file, 'r') as file_to_read:
+        for line in file_to_read:
+            if module in line:
+                module_present = True
+                if 'from' not in line:
+                    new_lines.append(
+                        re.sub(
+                            r'(?P<pre>[^ ]+)\.{}(?P<post>[^ \n]+)'
+                                .format(module),
+                            r'\g<pre>\g<post>.{}'.format(module),
+                            line))
+                else:
+                    new_lines.append(
+                        re.sub(
+                            r'(?P<pre>[^ ]+)\.{} import (?P<post>\w+)'
+                                .format(module),
+                            r'\g<pre>.\g<post> import {}'.format(module),
+                            line))
+            else:
+                new_lines.append(line)
 
-  if module_present:
-      with open(current_file, 'w') as file_to_write:
-          for line in new_lines:
-              file_to_write.write(line)
+    if module_present:
+        with open(current_file, 'w') as file_to_write:
+            for line in new_lines:
+                file_to_write.write(line)
 
 
 def main(argv=None):
