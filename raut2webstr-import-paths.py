@@ -54,6 +54,7 @@ def change_import_path(directory, module, src_file, dry_run=False):
                 if re.search(r'^from .*models.*|from .*models.*', containt):
                     print("sed -i 's/([^ ]+)\.{0} import (\w+)/\\1.\\2"
                               " import {0}/g' {1}".format(module, src_file))
+        return
 
     with open(current_file, 'r') as file_to_read:
         for line in file_to_read:
