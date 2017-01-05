@@ -97,12 +97,12 @@ def main(argv=None):
         return 1
 
     # do the transformation, happens in place
-    for _, _, file_list in os.walk(args.directory):
+    for directory, _, file_list in os.walk(args.directory):
         python_files = [fl for fl in file_list if is_py_file(fl)]
         for python_file in python_files:
             for raut_module in RAUT_MODULES:
                 change_import_path(
-                    args.directory, raut_module,
+                    directory, raut_module,
                     python_file, dry_run=args.dry_run)
 
 
